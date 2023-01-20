@@ -1,7 +1,5 @@
 <?php
-header("Content-type: text");
-ini_set('display_errors', 1);
-
+header("Content-type: application/json; charset=utf-8");
 # get variable
 if(isset($_GET["input"])) {
     $input = htmlentities($_GET["input"]); # hopefully this is fine enough?
@@ -19,6 +17,10 @@ if(in_array($input, $games)) {
 }
 else if($input == "createdby") { // display credit
     echo("Poopster created by @AnvilSP");
+    exit();
+}
+else if($input == "help") {
+    echo("Parameters: [dx] Deluxe [tnr] Touch & Roll [splitz] Banana Splitz [ro] Rolled Out");
     exit();
 }
 else if($input == "context") { // display stage context
@@ -44,34 +46,32 @@ $paths = [
     'ro_second' => 'stagename/rolledout/ro-secondhalf.txt',
     'tnr_full' => 'stagename/tnr/stagename.txt',
     'tnr_first' => 'stagename/tnr/firsthalf.txt',
-    'tnr_second' => 'stagename/tnr/secondhalf.txt'
+    'tnr_second' => 'stagename/tnr/secondhalf.txt',
+    'splitz_full' => 'stagename/splitz/stagename.txt',
+    'splitz_first' => 'stagename/splitz/firsthalf.txt',
+    'splitz_second' => 'stagename/splitz/secondhalf.txt'
 ];
 
 // append text files to array
 if($input == "dx" || !$input) {
-    //print("parse dx stages<br>");
     $fullstages = append_names($fullstages, $paths['smbdx_full']);
     $firsthalves = append_names($firsthalves, $paths['smbdx_first']);
     $secondhalves = append_names($secondhalves, $paths['smbdx_second']);
-    //print_r($fullstages);
-    //print(count($fullstages));
 }
 if($input == "ro" || !$input) {
-    //print("<br>parse rolled out stages<br>");
     $fullstages = append_names($fullstages, $paths['ro_full']);
     $firsthalves = append_names($firsthalves, $paths['ro_first']);
     $secondhalves = append_names($secondhalves, $paths['ro_second']);
-    //print_r($fullstages);
-    //print(count($fullstages));
 }
 if($input == "tnr" || !$input) {
-    //print("<br>parse touch and roll stages");
     $fullstages = append_names($fullstages, $paths['tnr_full']);
     $firsthalves = append_names($firsthalves, $paths['tnr_first']);
     $secondhalves = append_names($secondhalves, $paths['tnr_second']);
 }
 if($input == "splitz" || !$input) {
-    //print("parse splitz stages");
+    $fullstages = append_names($fullstages, $paths['splitz_full']);
+    $firsthalves = append_names($firsthalves, $paths['splitz_first']);
+    $secondhalves = append_names($secondhalves, $paths['splitz_second']);
 }
 
 # once everything has been appended, pick stages
@@ -83,12 +83,12 @@ if(!count($fullstages))
 }
 
 # first half
-$rng1 = rand(0, count($fullstages));
+$rng1 = rand(0, count($fullstages) - 1);
 $selected1 = $firsthalves[$rng1];
 $full1 = $fullstages[$rng1];
 
 # determine second half
-$rng2 = rand(0, count($fullstages));
+$rng2 = rand(0, count($fullstages) - 1);
 $selected2 = $secondhalves[$rng2];
 $full2 = $fullstages[$rng2];
 
