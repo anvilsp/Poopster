@@ -1,0 +1,7 @@
+--- 1/28/23 ---
+- [dx] Changed Vortex [Vor/tex -> Vort/ex]. This is also reflected in Ballygon stages
+- [dx] Added Banana Mania stage names to DX pool (Push Bar, Banana Plate, Last Stage, Detours, Post Modern)
+- [bg] Add Ballygon stage names (Credit to Dead Line for IL sheet)
+- [snr] Add Super Monkey Ball: Step & Roll stage names
+
+- [tnr] Change Assimilate [Ass/imilate -> Assim/ilate"

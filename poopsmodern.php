@@ -1,8 +1,8 @@
 <?php
 header("Content-type: application/json; charset=utf-8");
 # get variable
-if(isset($_GET["input"])) {
-    $input = htmlentities(strtolower($_GET["input"])); # hopefully this is fine enough?
+if(isset($_GET["input"]) && !empty(trim($_GET['input']))) {
+    $input = explode(" ", htmlentities(strtolower(trim($_GET["input"])))); # hopefully this is fine enough?
 }
 else    // no variable set, so null
 {
@@ -10,27 +10,32 @@ else    // no variable set, so null
 }
 $contextmode = false;
 
+print_r($input);
+
 # WHAT DO WE DO WITH THE GET VARIABLE??
 $games = array('dx', 'ro', 'tnr', 'splitz', 'snr', 'bg', 'monkey', 'indie');
-if(in_array($input, $games)) { 
-    // specific games!
-}
-else if($input == "createdby") { // display credit
-    echo("Poopster created by @AnvilSP");
-    exit();
-}
-else if($input == "help") {
-    echo("Poopster combines two stage names from the following games (these can be used as parameters): [dx] Deluxe [tnr] Touch & Roll [snr] Step & Roll [splitz] Banana Splitz [ro] Rolled Out [bg] Ballygon. 
-    Use [context] to display full stage names, [monkey] to randomize only stages from Super Monkey Ball, or [indie] for only stages from indie games on the list. 
-    (Parameters can't be combined)");
-    exit();
-}
-else if($input == "context") { // display stage context
-    $contextmode = true;
-    $input = NULL;
-}
-else {
-    $input = NULL;
+if(isset($input)) {
+    if(in_array($input[0], $games)) { 
+        // specific games!
+        //print("gaming\n");
+    }
+    if(in_array("createdby", $input)) { // display credit
+        echo("Poopster created by @AnvilSP");
+        exit();
+    }
+    if(in_array("help", $input)) {
+        echo("Poopster combines two stage names from the following games: [dx] Deluxe [tnr] Touch & Roll [snr] Step & Roll [splitz] Banana Splitz [ro] Rolled Out [bg] Ballygon. 
+        Use [context] to display full stage names, [monkey] to randomize only stages from Super Monkey Ball, or [indie] for only stages from indie games on the list. 
+        [context] must either be the LAST parameter, or the ONLY parameter, for the desired behavior.");
+        exit();
+    }
+    if(in_array("context", $input)) { // display stage context
+        $contextmode = true;
+        //print("context\n");
+        if(count($input) == 1 || (count($input) > 1 && $input[0] == "context")) {
+            $input = NULL;
+        }
+    }
 }
 
 # DEFINE ARRAYS
@@ -61,32 +66,38 @@ $paths = [
 ];
 
 // append text files to array
-if($input == "dx" || $input == "monkey" || !$input) { // Super Monkey Ball Deluxe
+if((isset($input) && in_array($input[0], array('dx', 'deluxe', 'mania', 'monkey'))) || !isset($input)) { // Super Monkey Ball Deluxe
+    //print("loaded dx stages\n");
     $fullstages = append_names($fullstages, $paths['smbdx_full']);
     $firsthalves = append_names($firsthalves, $paths['smbdx_first']);
     $secondhalves = append_names($secondhalves, $paths['smbdx_second']);
 }
-if($input == "tnr" || $input == "monkey" || !$input) { // Super Monkey Ball: Touch & Roll
+if((isset($input) && in_array($input[0], array('tnr', 'touchandroll', 'monkey'))) || !isset($input)) { // Super Monkey Ball: Touch & Roll
+    //print("loaded tnr stages\n");
     $fullstages = append_names($fullstages, $paths['tnr_full']);
     $firsthalves = append_names($firsthalves, $paths['tnr_first']);
     $secondhalves = append_names($secondhalves, $paths['tnr_second']);
 }
-if($input == "snr" || $input == "monkey" || !$input) { // Super Monkey Ball: Step & Roll
+if((isset($input) && in_array($input[0], array('snr', 'stepandroll', 'monkey'))) || !isset($input)) { // Super Monkey Ball: Step & Roll
+    //print("loaded snr stages\n");
     $fullstages = append_names($fullstages, $paths['snr_full']);
     $firsthalves = append_names($firsthalves, $paths['snr_first']);
     $secondhalves = append_names($secondhalves, $paths['snr_second']);
 }
-if($input == "splitz" || $input == "monkey" || !$input) { // Super Monkey Ball: Banana Splitz
+if((isset($input) && in_array($input[0], array('splitz', 'monkey')) || !isset($input))) { // Super Monkey Ball: Banana Splitz
+    //print("loaded splitz stages\n");
     $fullstages = append_names($fullstages, $paths['splitz_full']);
     $firsthalves = append_names($firsthalves, $paths['splitz_first']);
     $secondhalves = append_names($secondhalves, $paths['splitz_second']);
 }
-if($input == "ro" || $input == "indie" || !$input) { // Rolled Out!
+if((isset($input) && in_array($input[0], array('ro', 'rolledout', 'indie'))) || !isset($input)) { // Rolled Out!
+    //print("loaded ro stages\n");
     $fullstages = append_names($fullstages, $paths['ro_full']);
     $firsthalves = append_names($firsthalves, $paths['ro_first']);
     $secondhalves = append_names($secondhalves, $paths['ro_second']);
 }
-if($input == "bg" || $input == "indie" || !$input) { // BALLYGON
+if((isset($input) && in_array($input[0], array('bg', 'ballygon', 'indie'))) || !isset($input)) { // BALLYGON
+    //print("loaded bg stages\n");
     $fullstages = append_names($fullstages, $paths['bg_full']);
     $firsthalves = append_names($firsthalves, $paths['bg_first']);
     $secondhalves = append_names($secondhalves, $paths['bg_second']);

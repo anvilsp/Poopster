@@ -6,7 +6,7 @@ re
 conda
 _Travelator
 the
-imilate
+ilate
 _Staircase
 _Bump
 _Scepter

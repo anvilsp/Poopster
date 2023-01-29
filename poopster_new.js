@@ -13,13 +13,13 @@ window.onload = function(){
 
     generateArray("poops.php?input=context").then(result => {
         document.getElementById("oopsResult").innerHTML = result[0];
-        document.getElementById("oopsOriginal").innerHTML =  result[1].replace(/[\(\)]/g, '');
+        document.getElementById("oopsOriginal").innerHTML =  result[1].replace(/[\[\]']+/g, '');
     });
 
     document.getElementById("makeOopster").onclick = function(){ // click generate button to generate the oopsie
         generateArray("poops.php?input=context").then(result => {
             document.getElementById("oopsResult").innerHTML = result[0];
-            document.getElementById("oopsOriginal").innerHTML =  result[1].replace(/[\(\)]/g, '');
+            document.getElementById("oopsOriginal").innerHTML =  result[1].replace(/[\[\]']+/g, '');
             
             // hide original names if they're currently visible
             var originalNames = document.getElementById("oopsOriginal");
@@ -36,5 +36,17 @@ window.onload = function(){
         } else {
             originalNames.style.visibility = "hidden";
         }
+    }
+
+    document.getElementById("api").onclick = function() {
+        var apiBox = document.getElementById("api_box")
+        if (apiBox.style.display == "none")
+            apiBox.style.display = "block";
+        else
+            apiBox.style.display = "none";
+    }
+
+    document.getElementById("api_box").onclick = function() {
+        this.setSelectionRange(0, this.value.length);
     }
 }

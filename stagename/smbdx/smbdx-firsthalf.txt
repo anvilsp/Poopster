@@ -146,7 +146,7 @@ Twin
 Entangled
 Tot
 Sn
-Vor
+Vort
 Wi
 Wa
 Slide
@@ -305,3 +305,8 @@ He
 Dizzy
 Des
 Nin
+Push
+Banana
+Last
+De
+Post

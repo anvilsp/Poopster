@@ -146,7 +146,7 @@ _Attacker
 _Path
 ters
 ake
-tex
+ex
 nd
 rp
 rs
@@ -305,3 +305,8 @@ lix
 _System
 tiny
 tendo
+_Bar
+_Plate
+_Stage
+tours
+_Modern
