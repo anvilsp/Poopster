@@ -1,6 +1,7 @@
 import random
 import sys
 import html
+import re
 
 class World: # ie Stage 69, Floor 21, World 9-10
     def __init__(self, prefix, stagenumber):
@@ -114,7 +115,7 @@ final_string = ""
 if enable_world:
     final_string += world.prefix + " " + world.stagenumber + " - "
 # append the stage name
-final_string += stage_firsthalf[stage1] + stage_secondhalf[stage2]
+final_string += (stage_firsthalf[stage1] + stage_secondhalf[stage2]).replace("_", " ")
 # append the stage context if it's called for
 if enable_context:
     final_string += ";[" + stage_fullname[stage1] + " and " + stage_fullname[stage2] + "]"
