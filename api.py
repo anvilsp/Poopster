@@ -48,12 +48,12 @@ final_seed = ""
 
 # Weed out important flag words from potential seed
 for word in list(extra_args):
-    if word in stagewords or word in flagwords or word == "api.py":
+    if word in stagewords or word in flagwords or word == "api.py": # in theory api.py wouldn't have to be stripped out in a non-console environment
         extra_args.remove(word)
 
 # Generate potential seed string
 for word in list(extra_args):
-    final_seed = html.escape(final_seed + word + " ", True)
+    final_seed = html.escape(final_seed + word + " ", True) # TODO: strip out special characters or figure out how to make them not hang
 
 # If we have a seed, randomize based off of it
 if len(final_seed) > 0:
