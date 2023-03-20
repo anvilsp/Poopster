@@ -1,128 +1,159 @@
 <?php
 header("Content-type: application/json; charset=utf-8");
-# get variable
-if(isset($_GET["input"])) {
-    $input = htmlentities(strtolower($_GET["input"])); # hopefully this is fine enough?
-}
-else    // no variable set, so null
-{
-    $input = NULL;
-}
-$contextmode = false;
 
-# WHAT DO WE DO WITH THE GET VARIABLE??
-$games = array('dx', 'ro', 'tnr', 'splitz', 'snr', 'bg', 'monkey', 'indie');
-if(in_array($input, $games)) { 
-    // specific games!
-}
-else if($input == "createdby") { // display credit
-    echo("Poopster created by @AnvilSP");
-    exit();
-}
-else if($input == "help") {
-    echo("Poopster combines two stage names from the following games (these can be used as parameters): [dx] Deluxe [tnr] Touch & Roll [snr] Step & Roll [splitz] Banana Splitz [ro] Rolled Out [bg] Ballygon. 
-    Use [context] to display full stage names, [monkey] to randomize only stages from Super Monkey Ball, or [indie] for only stages from indie games on the list. 
-    (Parameters can't be combined)");
-    exit();
-}
-else if($input == "context") { // display stage context
-    $contextmode = true;
-    $input = NULL;
-}
-else {
-    $input = NULL;
-}
+$stagewords = ["dx", "ro", "splitz", "tnr", "bg", "snr", "monkey", "indie"];
+$flagwords = ["context", "world"];
+$world_prefix = ["World", "Floor", "Stage"];
 
-# DEFINE ARRAYS
-$firsthalves = array();     // array of first stage name halves
-$secondhalves = array();    // array of second stage name halves
-$fullstages = array();      // array of full stage names
-
-# DEFINE PATHS
-$paths = [
-    'smbdx_full' => 'stagename/smbdx/smbdx-stagename.txt',
-    'smbdx_first' => 'stagename/smbdx/smbdx-firsthalf.txt',
-    'smbdx_second' => 'stagename/smbdx/smbdx-secondhalf.txt',
-    'ro_full' => 'stagename/rolledout/ro-stagename.txt',
-    'ro_first' => 'stagename/rolledout/ro-firsthalf.txt',
-    'ro_second' => 'stagename/rolledout/ro-secondhalf.txt',
-    'tnr_full' => 'stagename/tnr/stagename.txt',
-    'tnr_first' => 'stagename/tnr/firsthalf.txt',
-    'tnr_second' => 'stagename/tnr/secondhalf.txt',
-    'snr_full' => 'stagename/snr/stagename.txt',
-    'snr_first' => 'stagename/snr/firsthalf.txt',
-    'snr_second' => 'stagename/snr/secondhalf.txt',
-    'splitz_full' => 'stagename/splitz/stagename.txt',
-    'splitz_first' => 'stagename/splitz/firsthalf.txt',
-    'splitz_second' => 'stagename/splitz/secondhalf.txt',
-    'bg_full' => 'stagename/bg/stagename.txt',
-    'bg_first' => 'stagename/bg/firsthalf.txt',
-    'bg_second' => 'stagename/bg/secondhalf.txt'
+$stage_lists = [
+    # key is game name, index 0 is the full stage name, index 1 is the first stage half, index 2 is the second stage half
+    "dx" => ["stagename/smbdx/smbdx-stagename.txt", "stagename/smbdx/smbdx-firsthalf.txt", "stagename/smbdx/smbdx-secondhalf.txt"],
+    "ro" => ["stagename/rolledout/ro-stagename.txt", "stagename/rolledout/ro-firsthalf.txt", "stagename/rolledout/ro-secondhalf.txt"],
+    "tnr" => ["stagename/tnr/stagename.txt", "stagename/tnr/firsthalf.txt", "stagename/tnr/secondhalf.txt"],
+    "snr" => ["stagename/snr/stagename.txt", "stagename/snr/firsthalf.txt", "stagename/snr/secondhalf.txt"],
+    "splitz" => ["stagename/splitz/stagename.txt", "stagename/splitz/firsthalf.txt", "stagename/splitz/secondhalf.txt"], 
+    "bg" => ["stagename/bg/stagename.txt", "stagename/bg/firsthalf.txt", "stagename/bg/secondhalf.txt"]
 ];
 
-// append text files to array
-if($input == "dx" || $input == "monkey" || !$input) { // Super Monkey Ball Deluxe
-    $fullstages = append_names($fullstages, $paths['smbdx_full']);
-    $firsthalves = append_names($firsthalves, $paths['smbdx_first']);
-    $secondhalves = append_names($secondhalves, $paths['smbdx_second']);
-}
-if($input == "tnr" || $input == "monkey" || !$input) { // Super Monkey Ball: Touch & Roll
-    $fullstages = append_names($fullstages, $paths['tnr_full']);
-    $firsthalves = append_names($firsthalves, $paths['tnr_first']);
-    $secondhalves = append_names($secondhalves, $paths['tnr_second']);
-}
-if($input == "snr" || $input == "monkey" || !$input) { // Super Monkey Ball: Step & Roll
-    $fullstages = append_names($fullstages, $paths['snr_full']);
-    $firsthalves = append_names($firsthalves, $paths['snr_first']);
-    $secondhalves = append_names($secondhalves, $paths['snr_second']);
-}
-if($input == "splitz" || $input == "monkey" || !$input) { // Super Monkey Ball: Banana Splitz
-    $fullstages = append_names($fullstages, $paths['splitz_full']);
-    $firsthalves = append_names($firsthalves, $paths['splitz_first']);
-    $secondhalves = append_names($secondhalves, $paths['splitz_second']);
-}
-if($input == "ro" || $input == "indie" || !$input) { // Rolled Out!
-    $fullstages = append_names($fullstages, $paths['ro_full']);
-    $firsthalves = append_names($firsthalves, $paths['ro_first']);
-    $secondhalves = append_names($secondhalves, $paths['ro_second']);
-}
-if($input == "bg" || $input == "indie" || !$input) { // BALLYGON
-    $fullstages = append_names($fullstages, $paths['bg_full']);
-    $firsthalves = append_names($firsthalves, $paths['bg_first']);
-    $secondhalves = append_names($secondhalves, $paths['bg_second']);
-}
+$stage_firsthalf = [];
+$stage_secondhalf = [];
+$stage_fullname = [];
 
-# once everything has been appended, pick stages
+#$args = $argv;
+$input = htmlentities($_GET['input']);
+$args = explode(" ", $input);
+$check_arg = array_intersect($args, $stagewords);
 
-if(!count($fullstages))
+$enable_world = false;
+$enable_context = false;
+
+if(count($args) == 1) # if there's exactly 1 argument
 {
-    echo("[Error]");
-    exit();
+    # check if the arguments are the ones that should halt the program
+    if($args[0] == "createdby")
+    {
+        echo("Poopster created by @AnvilSP | https://anvilsp.com/poopster");
+        exit();
+    }
+    else if ($args[0] == "help")
+    {
+        echo("Poopster combines two stage names from the following games (these can be used as parameters): [dx] Deluxe [tnr] Touch & Roll [snr] Step & Roll [splitz] Banana Splitz [ro] Rolled Out! [bg] BALLYGON. Use [world] to display a random stage number, [context] to display full stage names, [monkey] to randomize only stages from Super Monkey Ball, or [indie] for only stages from indie games on the list.");
+        exit();
+    }
+}
+if(in_array("world", $args))
+{
+    $enable_world = true;
+}
+if(in_array("context", $args))
+{
+    $enable_context = true;
 }
 
-# first half
-$rng1 = rand(0, count($fullstages) - 1);
-$selected1 = $firsthalves[$rng1];
-$full1 = $fullstages[$rng1];
+$extra_args = $args;
+$final_seed = "";
 
-# determine second half
-$rng2 = rand(0, count($fullstages) - 1);
-$selected2 = $secondhalves[$rng2];
-$full2 = $fullstages[$rng2];
-
-$generatedPoops = spacify(trim($selected1).trim($selected2));
-print($generatedPoops);
-if($contextmode) {
-    print(";[");
-    print(spacify(trim($full1))." and ".spacify(trim($full2)));
-    print("]");
+# Weed out important flag words from potential seed
+foreach($extra_args as $word => $entry) {
+    if(in_array($entry, $stagewords) || in_array($entry, $flagwords) || $entry == basename(__FILE__))
+    {
+        unset($extra_args[$word]);
+    }
 }
 
-function append_names($arr, $path) {
+# print_r($extra_args);
+
+# Generate potential seed string
+foreach($extra_args as $word) {
+    $final_seed = $final_seed.$word." ";
+}
+#print("seed: " . $final_seed);
+
+# If we have a seed, randomize based off of it
+if(trim($final_seed) != ""){
+    #print("\nseed detected");
+    $rnd_seed = crc32($final_seed);
+    # print("\nconverted to " . $rnd_seed);
+    srand($rnd_seed);
+}
+
+function append_from_txt($arr, $path) {
+    # append from a text file to the chosen array
     $new = file($path);
     $arr = array_merge($arr, $new);
-   return $arr;
+    return $arr;
 }
+
+function append_stages(string $game_name) {
+    global $stage_lists, $stage_fullname, $stage_firsthalf, $stage_secondhalf; # why do i gotta do that
+    $stage_fullname = append_from_txt($stage_fullname, $stage_lists[$game_name][0]);
+    $stage_firsthalf = append_from_txt($stage_firsthalf, $stage_lists[$game_name][1]);
+    $stage_secondhalf = append_from_txt($stage_secondhalf, $stage_lists[$game_name][2]);
+}
+
+function generate_world() {
+    global $world_prefix;
+    # for if the 'world' flag is used, generate a stage number to go before the randomized name
+    $random_prefix = rand(0, 2); # 0 = World (SMB2 Story), 1 = Floor (SMB1), 2 = Stage (SMB2 Challenge)
+
+    if($random_prefix == 0) {
+        # if we roll World, sgenerate the stage number in the World format; up to 10-20 to fit SMBDX conventions
+        $stagenumber = rand(1,10)."-".rand(1,20);
+    }
+    else {
+        # if we're on a Floor or Stage, generate a number between 1 and 999
+        $stagenumber = rand(1,999);
+    }
+
+    return $world_prefix[$random_prefix] . " " . $stagenumber;
+}
+
+# Append stages based on arguments
+if(in_array("dx", $args) || in_array("monkey", $args) || empty($check_arg)) {
+    # Super Monkey Ball Deluxe / Banana Mania / 2; args: dx, monkey    
+    append_stages("dx");
+}
+if(in_array("tnr", $args) || in_array("monkey", $args) || empty($check_arg)) {
+    # Super Monkey Ball: Touch & Roll; args: tnr, monkey    
+    append_stages("tnr");
+}
+if(in_array("snr", $args) || in_array("monkey", $args) || empty($check_arg)) {
+    # Super Monkey Ball: Step & Roll; args: snr, monkey    
+    append_stages("snr");
+}
+if(in_array("splitz", $args) || in_array("monkey", $args) || empty($check_arg)) {
+    # Super Monkey Ball: Banana Splitz; args: splitz, monkey    
+    append_stages("splitz");
+}
+if(in_array("ro", $args) || in_array("indie", $args) || empty($check_arg)) {
+    # Rolled Out!; args: ro, indie
+    append_stages("ro");
+}
+if(in_array("bg", $args) || in_array("indie", $args) || empty($check_arg)) {
+    # BALLYGON; args: bg, indie
+    append_stages("bg");
+}
+
+# Random generation
+$world = generate_world();
+$stage1 = rand(0, (count($stage_fullname) - 1));
+$stage2 = rand(0, (count($stage_fullname) - 1));
+$final_string = "";
+
+# append world if it's called for
+if($enable_world) {
+    $final_string = $final_string . $world . " - ";
+}
+
+$final_string = $final_string . spacify(trim($stage_firsthalf[$stage1]) . trim($stage_secondhalf[$stage2]));
+
+# append the stage context if it's called for
+if($enable_context){
+    $final_string = $final_string . ";[" . spacify(trim($stage_fullname[$stage1])) . " and " . spacify(trim($stage_fullname[$stage2])) . "]";
+}
+
+# print the final string
+print($final_string);
 
 function spacify($var) {
     return str_replace('_', ' ', $var);
