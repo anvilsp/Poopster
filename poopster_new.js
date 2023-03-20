@@ -11,13 +11,13 @@ async function generateArray(url) {
 
 window.onload = function(){
 
-    generateArray("poops.php?input=context").then(result => {
+    generateArray("poops_old.php?input=context").then(result => {
         document.getElementById("oopsResult").innerHTML = result[0];
         document.getElementById("oopsOriginal").innerHTML =  result[1].replace(/[\[\]']+/g, '');
     });
 
     document.getElementById("makeOopster").onclick = function(){ // click generate button to generate the oopsie
-        generateArray("poops.php?input=context").then(result => {
+        generateArray("poops_old.php?input=context").then(result => {
             document.getElementById("oopsResult").innerHTML = result[0];
             document.getElementById("oopsOriginal").innerHTML =  result[1].replace(/[\[\]']+/g, '');
             
