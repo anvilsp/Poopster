@@ -2,15 +2,18 @@
 <html>
     <head>
         <title>Poopster</title>
-        <script src="poopster_new.js"></script>
+        <script src="rando.js"></script>
         <link rel="stylesheet" href="style.css">
         <meta name="viewport" content="width=device-width">
     </head>
     
     <body>
         <div class="mainContent">
-            <button id="makeOopster" class="bigButton">Generate</button>
+            <form onsubmit="handleForm(event)">
+                <input type="text" placeholder="Seed (Optional)" class="input" id="seed" name="seed"><input type="submit" id="makeOopster" class="bigButton" value="Go">
+            </form>
             <br>
+            <b id="oopsWorld">&nbsp;</b>
             <h1 id="oopsResult">&nbsp;</h1>
             <span id="oopsOriginal" style="visibility: hidden">&nbsp;</span>
         </div>

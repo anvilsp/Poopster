@@ -1,3 +1,14 @@
+--- 5/8/23 ---
+- Parameters now require a dash in front of them (ie !poopster -ro GonGOn), freeing up some words for seeds that were previously reserved.
+- Context flag now displays the game that each stage came from.
+- Added ability to save rolls to a log file with the "-log" command
+- Split up help commands so that they don't immediately flood Twitch chat
+- Groundwork in place for update to long-neglected web frontend
+
+- [ro] Corrected "Crushcheck" being split as "Crush/Check"
+
+- Web version updated with seed support and improved context
+
 --- 2/6/23 ---
 - [snr] Changed Nazca [Naz/ca -> Na/zca]
 
@@ -7,4 +18,4 @@
 - [bg] Add Ballygon stage names (Credit to Dead Line for IL sheet)
 - [snr] Add Super Monkey Ball: Step & Roll stage names
 
-- [tnr] Change Assimilate [Ass/imilate -> Assim/ilate"
+- [tnr] Change Assimilate [Ass/imilate -> Assim/ilate]

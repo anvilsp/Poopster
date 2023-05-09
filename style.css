@@ -7,12 +7,24 @@ body {
 }
 
 .bigButton {
-    padding: 2em;
-    border-radius: 0.5em;
+    padding: 1.5em 1.5em 1.5em 1.5em;
+    border-radius: 0em 0.5em 0.5em 0em;
+    margin-left: 0;
     border: none;
     background-color: gray;
     font-weight: bold;
-    color: white
+    color: white;
+    font-size: 12pt;
+}
+
+.input {
+    padding: 1.5em;
+    border-radius: 0.5em 0em 0em 0.5em;
+    border: none;
+    background-color: black;
+    color: white;
+    font-size: 12pt;
+    width: 60%;
 }
 
 .mainContent {
@@ -21,8 +33,9 @@ body {
     border-radius: 0.5em;
     max-width: 50em;
     background-color: #353535;
-    padding: 3em;
+    padding: 5em 1em 5em 1em;
     color: #fff;
+    min-height: 12em;
 }
 
 .footer {

@@ -33,7 +33,7 @@ square
 bell
 _Walk
 _Fall
-Check
+check
 _Wire
 urn
 position
