@@ -1,11 +1,24 @@
---- 5/12/23 ---
+--- 9/3/23 | v4.0.1 ---
+- Addressed an oversight where running the -old flag along with only new v4 game flags would return a blank, which would break Nightbot; a simple error is now printed
+- The -old flag is now preserved in the log when a stage using said flag is saved.
+- If -old is combined with flags from v4 games and v3 games, the unnecessary v4 flags (which do not populate any stages in this mode) are now stripped before being entered into the log.
+
+--- 8/26/23 | v4.0 ---
+- [Poopster enters Version 4!]
+- [ro] Updated Rolled Out stage list to v0.5.8
+- [smba] Added Super Monkey Ball Adventure stages to the roster
+- [smb3d] Added Super Monkey Ball 3D stages to the roster
+- The -old command has been added to maintain support for older (pre-v4) seeds, as adding more stages effectively resets all seeds.
+- All previously saved log entries now have the -old tag appended to them.
+
+--- 5/12/23 | v3.2 ---
 - Log system reworked, now duplicates and random rolls without a seed cannot be logged
 - Added new log page to display entries because json isn't easy to wade through
 - Added -saved parameter, which only rolls from items in the log
 - Added blacklist for specific rolls; should reroll if encountered without a seed, but otherwise replaces the stage name.
 - Blacklisted rolls can also not be logged
 
---- 5/8/23 ---
+--- 5/8/23 | v3.1 ---
 - Parameters now require a dash in front of them (ie !poopster -ro GonGOn), freeing up some words for seeds that were previously reserved.
 - Context flag now displays the game that each stage came from.
 - Added ability to save rolls to a log file with the "-log" command
@@ -16,16 +29,16 @@
 
 - Web version updated with seed support and improved context
 
---- 3/19/23 ---
+--- 3/19/23 | v3.0 ---
 - Poopster rewritten again (for the third time?)
 - Random seed support
 - Parameters can be combined
 - "context" and "world" flags added; "context" displays the stage names and "world" generates a random stage number. 
 
---- 2/6/23 ---
+--- 2/6/23 | v2.0.1 ---
 - [snr] Changed Nazca [Naz/ca -> Na/zca]
 
---- 1/28/23 ---
+--- 1/28/23 | v2.0 ---
 - [dx] Changed Vortex [Vor/tex -> Vort/ex]. This is also reflected in Ballygon stages
 - [dx] Added Banana Mania stage names to DX pool (Push Bar, Banana Plate, Last Stage, Detours, Post Modern)
 - [bg] Add Ballygon stage names (Credit to Dead Line for IL sheet)

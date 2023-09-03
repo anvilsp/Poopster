@@ -7,18 +7,22 @@ header("Content-type: application/json; charset=utf-8");
 define('LOGFILE', 'log/log.txt');
 define('CENSORFILE', 'log/censor.txt');
 
-$stagewords = ["-dx", "-ro", "-splitz", "-tnr", "-bg", "-snr", "-monkey", "-indie"];
-$flagwords = ["-context", "-world", "-log", "-saved"];
+$stagewords = ["-dx", "-ro", "-splitz", "-tnr", "-bg", "-snr", "-smba", "-smb3d", "-monkey", "-indie"];
+$new_stagewords = ["-smba", "-smb3d"]; # these CANNOT be rolled with the -old flag enabled
+$flagwords = ["-context", "-world", "-log", "-saved", "-old"];
 $world_prefix = ["World", "Floor", "Stage"];
 
 $stage_lists = [
     # key is game name, index 0 is the full stage name, index 1 is the first stage half, index 2 is the second stage half
     "dx" => ["stagename/smbdx/smbdx-stagename.txt", "stagename/smbdx/smbdx-firsthalf.txt", "stagename/smbdx/smbdx-secondhalf.txt"],
     "ro" => ["stagename/rolledout/ro-stagename.txt", "stagename/rolledout/ro-firsthalf.txt", "stagename/rolledout/ro-secondhalf.txt"],
+    "ro057" => ["stagename/rolledout/ro057-stagename.txt", "stagename/rolledout/ro057-firsthalf.txt", "stagename/rolledout/ro057-secondhalf.txt"], # rolled out v0.5.7 stage list, for legacy seed purposes
     "tnr" => ["stagename/tnr/stagename.txt", "stagename/tnr/firsthalf.txt", "stagename/tnr/secondhalf.txt"],
     "snr" => ["stagename/snr/stagename.txt", "stagename/snr/firsthalf.txt", "stagename/snr/secondhalf.txt"],
     "splitz" => ["stagename/splitz/stagename.txt", "stagename/splitz/firsthalf.txt", "stagename/splitz/secondhalf.txt"], 
-    "bg" => ["stagename/bg/stagename.txt", "stagename/bg/firsthalf.txt", "stagename/bg/secondhalf.txt"]
+    "bg" => ["stagename/bg/stagename.txt", "stagename/bg/firsthalf.txt", "stagename/bg/secondhalf.txt"],
+    "smb3d" => ["stagename/smb3d/stagename.txt", "stagename/smb3d/firsthalf.txt", "stagename/smb3d/secondhalf.txt"],
+    "smba" => ["stagename/smba/stagename.txt", "stagename/smba/firsthalf.txt", "stagename/smba/secondhalf.txt"],
 ];
 
 $error_messages = ["Filtered, please try a different seed!", "Sorry, can't say that one! Please reroll with a different seed.", "Bungled it! Please try another seed.", "oopsie teehee :3 please wewo with a different seed"];
@@ -54,6 +58,7 @@ $enable_context = false; # flag for -context
 $enable_log = false; # flag for -log
 $enable_force = false; # flag for ---force
 $enable_logonly = false; # flag for -saved
+$enable_old = false; # flag for -old
 $censored = false; # flag for if the roll is censored
 
 # CHECK INPUTS
@@ -73,12 +78,12 @@ if(count($args) == 1) # if there's exactly 1 argument
     }
     else if ($args[0] == "-games") # games help command
     {
-        echo("[Super Monkey Ball] -dx (Deluxe/2/BM) | -tnr (Touch & Roll) | -snr (Step & Roll) | -splitz (Banana Splitz) || [Indies] -ro (Rolled Out!) | -bg (BALLYGON) || -monkey for only Monkey Ball stages, -indie for only indie stages [Parameters can be combined]");
+        echo("[Super Monkey Ball] -dx (Deluxe/2/BM) | -tnr (Touch & Roll) | -snr (Step & Roll) | -splitz (Banana Splitz) | -smba (Adventure) | -smb3d (3D) || [Indies] -ro (Rolled Out!) | -bg (BALLYGON) || -monkey for only Monkey Ball stages, -indie for only indie stages [Parameters can be combined]");
         exit();
     }
     else if ($args[0] == "-modifiers") # modifiers help command
     {
-        echo("MODIFIERS: -context (Display stage names), -world (Generate a stage number), -log (Save the output to the log file), -viewlog (View the log file)");
+        echo("MODIFIERS: -context (Display stage names), -world (Generate a stage number), -log (Save the output to the log file), -viewlog (View the log file), -old (Use legacy randomizer; pre 08/26/23)");
         exit();
     } else if ($args[0] == "-viewlog") # view log command
     {
@@ -97,10 +102,12 @@ if(in_array("-context", $args)) # set enable_context flag if the user has specif
 if(in_array("-log", $args)){ # set enable_log flag if the user has specified it
     $enable_log = true;
 }
-if(in_array("-saved", $args)){ # set enable_log flag if the user has specified it
+if(in_array("-saved", $args)){ # set enable_logonly flag if the user has specified it
     $enable_logonly = true;
 }
-
+if(in_array("-old", $args)){ # set enable_old flag if the user has specified it
+    $enable_old = true;
+}
 $extra_args = $args;
 $final_seed = "";
 
@@ -108,7 +115,7 @@ $final_seed = "";
 foreach($extra_args as $word => $entry) {
     if(in_array($entry, $stagewords) || in_array($entry, $flagwords) || $entry == basename(__FILE__))
     {
-        if(!in_array($entry, $flagwords)) {
+        if(!in_array($entry, $flagwords) or ($entry == "-old")) { # we preserve the "old" flag even though it's not a game
             array_push($enabled_flags, $entry);
         }
         unset($extra_args[$word]);
@@ -125,7 +132,6 @@ if(trim($final_seed) != ""){
     $rnd_seed = crc32($final_seed); # convert to integer with crc32 because php requires an int for some reason
     srand($rnd_seed);
 }
-
 
 # Append stages based on arguments
 if(in_array("-dx", $args) || in_array("-monkey", $args) || empty($check_arg)) {
@@ -146,11 +152,44 @@ if(in_array("-splitz", $args) || in_array("-monkey", $args) || empty($check_arg)
 }
 if(in_array("-ro", $args) || in_array("-indie", $args) || empty($check_arg)) {
     # Rolled Out!; args: ro, indie
-    append_stages("ro");
+    if($enable_old == true) { # append 0.5.7 stages if we're in legacy mode
+        append_stages("ro057");
+    }
+    else {
+        append_stages("ro");
+    }
 }
 if(in_array("-bg", $args) || in_array("-indie", $args) || empty($check_arg)) {
     # BALLYGON; args: bg, indie
     append_stages("bg");
+}
+# v3: games that shouldn't be appended if -old is enabled
+if($enable_old == false)
+{
+    if(in_array("-smb3d", $args) || in_array("-monkey", $args) || empty($check_arg)) {
+        # Super Monkey Ball 3D; args: smb3d, monkey    
+        append_stages("smb3d");
+    }
+    if(in_array("-smba", $args) || in_array("-monkey", $args) || empty($check_arg)) {
+        # Super Monkey Ball Adventure; args: smba, monkey    
+        append_stages("smba");
+    }
+}
+
+# check if no stages have been appended
+if(empty($stage_fullname)){
+    print("Error");
+    exit();
+}
+
+# check if "-old" is set and new games have been specified in the flags
+if($enable_old and array_intersect($new_stagewords, $args)) {
+    foreach($new_stagewords as $flag) {
+        if(in_array($flag, $enabled_flags)) { # remove flags that aren't compatible for logging purposes
+            $array_index = array_search($flag, $enabled_flags);
+            unset($enabled_flags[$array_index]);
+        }
+    }
 }
 
 # Preliminary stuff is out of the way, this is where the magic happens
