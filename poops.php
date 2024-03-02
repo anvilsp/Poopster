@@ -85,7 +85,7 @@ if(count($args) == 1) # if there's exactly 1 argument
     {
         echo("MODIFIERS: -context (Display stage names), -world (Generate a stage number), -log (Save the output to the log file), -viewlog (View the log file), -old (Use legacy randomizer; pre 08/26/23)");
         exit();
-    } else if ($args[0] == "-viewlog") # view log command
+    } else if ($args[0] == "-viewlog" || $args[0] == "-log") # view log command
     {
         echo("https://anvilsp.com/poopster/log");
         exit();
@@ -350,6 +350,9 @@ function log_stage(array $stage) {
         return print(" | Already in log");
     }
     else { # not a duplicate, so we can log it
+        if(empty($logged_stages)) {
+            $logged_stages = array();
+        }
         array_push($logged_stages, $stage);
         $logged_as_json = json_encode($logged_stages);
         file_put_contents(LOGFILE, $logged_as_json);
