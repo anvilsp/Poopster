@@ -7,7 +7,52 @@ header("Content-type: application/json; charset=utf-8");
 define('LOGFILE', 'log/log.txt');
 define('CENSORFILE', 'log/censor.txt');
 
-$stagewords = ["-dx", "-ro", "-splitz", "-tnr", "-bg", "-snr", "-smba", "-smb3d", "-monkey", "-indie"];
+class Stage {
+    public $stagename;
+    public $first_stage;
+    public $second_stage;
+    public $first_context;
+    public $second_context;
+    public $world;
+    public $flags;
+    public $seed;
+
+    function __construct($name, $stage1, $stage2, $context1, $context2, $world, $flags, $seed) {
+        $this->stagename = $name;
+        $this->first_stage = $stage1;
+        $this->second_stage = $stage2;
+        $this->first_context = $context1;
+        $this->second_context = $context2;
+        $this->world = $world;
+        $this->flags = $flags;
+        $this->seed = $seed;
+    }
+
+    function check_shiny() {
+        if($this->first_stage == $this->second_stage && $this->first_context == $this->second_context){
+            return true;
+        }
+        return false;
+    }
+
+    function get_result($world, $context) {
+        $final_string = '';
+        if($world) {
+            $final_string = $final_string . $this->world . ' ~ ';
+        }
+        $final_string = $final_string . $this->stagename . ($this->check_shiny() ? ' ⭐' : '');
+        if($context) {
+            $final_string = $final_string . " (" . $this->first_stage . " [" . $this->first_context . "] + " . $this->second_stage . " [" . $this->second_context . "])";
+        }
+        return $final_string;
+    }
+
+    function get_json() {
+        return json_encode($this);
+    }
+}
+
+$stagewords = ["-dx", "-ro", "-splitz", "-tnr", "-bg", "-snr", "-smba", "-smb3d", "-monkey", "-indie", "-soup"];
 $new_stagewords = ["-smba", "-smb3d"]; # these CANNOT be rolled with the -old flag enabled
 $flagwords = ["-context", "-world", "-log", "-saved", "-old"];
 $world_prefix = ["World", "Floor", "Stage"];
@@ -23,6 +68,8 @@ $stage_lists = [
     "bg" => ["stagename/bg/stagename.txt", "stagename/bg/firsthalf.txt", "stagename/bg/secondhalf.txt"],
     "smb3d" => ["stagename/smb3d/stagename.txt", "stagename/smb3d/firsthalf.txt", "stagename/smb3d/secondhalf.txt"],
     "smba" => ["stagename/smba/stagename.txt", "stagename/smba/firsthalf.txt", "stagename/smba/secondhalf.txt"],
+    "br" => ["stagename/br/stagename.txt", "stagename/br/firsthalf.txt", "stagename/br/secondhalf.txt"],
+    "soup" => ["stagename/soup/stagename.txt", "stagename/soup/firsthalf.txt", "stagename/soup/secondhalf.txt"]
 ];
 
 $error_messages = ["Filtered, please try a different seed!", "Sorry, can't say that one! Please reroll with a different seed.", "Bungled it! Please try another seed.", "oopsie teehee :3 please wewo with a different seed"];
@@ -59,6 +106,7 @@ $enable_log = false; # flag for -log
 $enable_force = false; # flag for ---force
 $enable_logonly = false; # flag for -saved
 $enable_old = false; # flag for -old
+$enable_v4 = false;
 $censored = false; # flag for if the roll is censored
 
 # CHECK INPUTS
@@ -78,7 +126,7 @@ if(count($args) == 1) # if there's exactly 1 argument
     }
     else if ($args[0] == "-games") # games help command
     {
-        echo("[Super Monkey Ball] -dx (Deluxe/2/BM) | -tnr (Touch & Roll) | -snr (Step & Roll) | -splitz (Banana Splitz) | -smba (Adventure) | -smb3d (3D) || [Indies] -ro (Rolled Out!) | -bg (BALLYGON) || -monkey for only Monkey Ball stages, -indie for only indie stages [Parameters can be combined]");
+        echo("[Super Monkey Ball] -dx (Deluxe/2/BM) | -tnr (Touch & Roll) | -snr (Step & Roll) | -splitz (Banana Splitz) | -smba (Adventure) | -smb3d (3D) | -br (Banana Rumble) || [Indies] -ro (Rolled Out!) | -bg (BALLYGON) || -monkey for only Monkey Ball stages, -indie for only indie stages [Parameters can be combined]");
         exit();
     }
     else if ($args[0] == "-modifiers") # modifiers help command
@@ -88,6 +136,9 @@ if(count($args) == 1) # if there's exactly 1 argument
     } else if ($args[0] == "-viewlog" || $args[0] == "-log") # view log command
     {
         echo("https://anvilsp.com/poopster/log");
+        exit();
+    } else if($args[0] == "-spreadsheet") {
+        echo("https://docs.google.com/spreadsheets/d/1nI0rKA26-tE7wKC8jB8JtYDAbNwEFRfz5u6y7PLqFd4/edit?usp=sharing");
         exit();
     }
 }
@@ -163,8 +214,8 @@ if(in_array("-bg", $args) || in_array("-indie", $args) || empty($check_arg)) {
     # BALLYGON; args: bg, indie
     append_stages("bg");
 }
-# v3: games that shouldn't be appended if -old is enabled
-if($enable_old == false)
+# v4: games that shouldn't be appended if -old is enabled
+if($enable_old == false || $enable_v4 != false)
 {
     if(in_array("-smb3d", $args) || in_array("-monkey", $args) || empty($check_arg)) {
         # Super Monkey Ball 3D; args: smb3d, monkey    
@@ -173,6 +224,16 @@ if($enable_old == false)
     if(in_array("-smba", $args) || in_array("-monkey", $args) || empty($check_arg)) {
         # Super Monkey Ball Adventure; args: smba, monkey    
         append_stages("smba");
+    }
+    if($enable_v4 != false) {
+        if(in_array("-br", $args) || in_array("-monkey", $args) || empty($check_arg)) {
+            # Super Monkey Ball Banana Rumble; args: br, monkey
+            append_stages("br");
+        }
+    }
+    if(in_array("-soup", $args)) {
+        # Soupster
+        append_stages("soup");
     }
 }
 
@@ -199,55 +260,51 @@ if(!$enable_logonly) # do default roll
 else { # roll from the logged stages
     $logfile = file_get_contents(LOGFILE);
     $logged_stages = json_decode($logfile);
-    $random_stage = rand(0, (count($logged_stages) - 1));
-    $final_stage = json_decode(json_encode($logged_stages[$random_stage]), true);
+    $random_stagenum = rand(0, (count($logged_stages) - 1));
+    $random_stage = $logged_stages[$random_stagenum];
+    $final_stage = new Stage(
+        $random_stage->stagename,
+        $random_stage->first_stage,
+        $random_stage->second_stage,
+        $random_stage->first_context,
+        $random_stage->second_context,
+        $random_stage->world,
+        $random_stage->flags,
+        $random_stage->seed
+    );
 }
 
 # Check if the roll appears in the blacklist
 $bad_filter = append_from_txt($bad_filter, CENSORFILE);
 foreach($bad_filter as $censored_word) {
     $censored_word = trim($censored_word); # i actually hate this programming language
-    if($final_stage['stagename'] == $censored_word) {
+    if($final_stage->stagename == $censored_word) {
         $censored = true;
         break;
     }
 }
 if($censored) { # bad roll!
-    if(trim($final_stage['seed']) == "") {
+    if(trim($final_stage->seed) == "") {
         # no seed detected; roll again
         $final_stage = generate_stage();
         $censored = false;
     }else{
         # display a random error message instead of the stage name
         srand();
-        $final_stage['stagename'] = $error_messages[rand(0, (count($error_messages) - 1))];
+        $final_stage->stagename = $error_messages[rand(0, (count($error_messages) - 1))];
     }
 }
 
 # DISPLAY RESULTS
 
 if($parse == "web") { # web output, spit out the raw json
-    print_r(json_encode($final_stage));
+    print_r($final_stage->get_json());
 }
 else{ # generic output, used for the nightbot command
     if($censored) # only display the stage name if it's censored, don't allow context (this still works on web tho)
-        $final_string = $final_stage['stagename'];
-    else{
-        # everything is fine, proceed as normal
-        $final_string = "";
-
-        # append world if it's called for
-        if($enable_world) {
-            $final_string = $final_string . $final_stage['world'] . " - ";
-        }
-
-        $final_string = $final_string . $final_stage['stagename'];
-
-        # append the stage context if it's called for
-        if($enable_context){
-            $final_string = $final_string . " (" . $final_stage['first_stage'] . " [" . $final_stage['first_context'] 
-            . "] and " . $final_stage['second_stage'] . " [" . $final_stage['second_context'] . "])";
-        }
+        $final_string = $final_stage->stagename;
+    else{ 
+        $final_string = $final_stage->get_result($enable_world, $enable_context);
     }
 
     # print the final string
@@ -268,17 +325,18 @@ function generate_stage() { # Function to generate the stage
     $stage1 = rand(0, (count($stage_fullname) - 1));
     $stage2 = rand(0, (count($stage_fullname) - 1));
     # i probably should've made these objects instead of just storing them as arrays... next time maybe
-    $final_array = array(
-        "stagename" => spacify(trim($stage_firsthalf[$stage1]) . trim($stage_secondhalf[$stage2])),
-        "first_stage" => spacify(trim($stage_fullname[$stage1])),
-        "second_stage" => spacify(trim($stage_fullname[$stage2])),
-        "first_context" => $stage_context[$stage1],
-        "second_context" => $stage_context[$stage2],
-        "world" => $world,
-        "flags" => $enabled_flags,
-        "seed" => isset($final_seed) ? trim($final_seed) : null
+    # get owned idiot they're objects now
+    $final_stage = new Stage(
+        spacify(trim($stage_firsthalf[$stage1]) . trim($stage_secondhalf[$stage2])),
+        spacify(trim($stage_fullname[$stage1])),
+        spacify(trim($stage_fullname[$stage2])),
+        $stage_context[$stage1],
+        $stage_context[$stage2],
+        $world,
+        $enabled_flags,
+        isset($final_seed) ? trim($final_seed) : null
     );
-    return $final_array;
+    return $final_stage;
 }
 
 function append_from_txt($arr, $path) {
@@ -314,11 +372,16 @@ function append_stages(string $game_name) { # automatically append the fullname,
 
 function generate_world() { # for if the 'world' flag is used, generate a stage number to go before the randomized name
     global $world_prefix;
-    $random_prefix = rand(0, 2); # 0 = World (SMB2 Story), 1 = Floor (SMB1), 2 = Stage (SMB2 Challenge)
+    $random_prefix = rand(0, 2); # 0 = World, 1 = Floor (SMB1), 2 = Stage (SMB2 Challenge)
 
     if($random_prefix == 0) {
-        # if we roll World, sgenerate the stage number in the World format; up to 10-20 to fit SMBDX conventions
-        $stagenumber = rand(1,10)."-".rand(1,20);
+        # if we roll World, generate the stage number in the World format
+        $is_ex = rand(0,1); # 0 = smb2 style, 1 = banana rumble EX
+        if($is_ex) { # World 10 EX-2 - They
+            $stagenumber = rand(1,10)." EX-".rand(1,20);
+        } else { # World 6-9 - Sticky Time
+            $stagenumber = rand(1,10)."-".rand(1,20);
+        }
     }
     else {
         # if we're on a Floor or Stage, generate a number between 1 and 999
@@ -328,10 +391,10 @@ function generate_world() { # for if the 'world' flag is used, generate a stage 
     return $world_prefix[$random_prefix] . " " . $stagenumber;
 }
 
-function log_stage(array $stage) {
+function log_stage(Stage $stage) {
     # save the stage to the log
     global $logged_stages;
-    if(trim($stage['seed']) == "") { # no seed was input, don't log
+    if(trim($stage->seed) == "") { # no seed was input, don't log
        return print(" | No seed found");
     }
     $logfile = file_get_contents(LOGFILE); # get log from file
@@ -340,7 +403,7 @@ function log_stage(array $stage) {
     # check if object is already in array
     if(!empty($logged_stages)) {
         foreach($logged_stages as $arrobj) {
-            if($stage['stagename'] == $arrobj->stagename) { # if we find a match, change the flag and exit the loop
+            if($stage->stagename == $arrobj->stagename && $arrobj->seed == $stage->seed) { # if we find a match, change the flag and exit the loop
                 $already_in_array = true;
                 break;
             }

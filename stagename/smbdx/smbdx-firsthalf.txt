@@ -233,7 +233,7 @@ Puz
 Polar
 Auto
 Heavy
-Stag
+Stagg
 U
 Ring
 Cha

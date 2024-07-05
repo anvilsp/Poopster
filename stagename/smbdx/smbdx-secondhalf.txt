@@ -233,7 +233,7 @@ zle
 _Large
 _Doors
 _Sphere
-ger
+er
 FO
 _Bridges
 os
