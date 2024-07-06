@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Log | Poopster</title>
-        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="../style.css">
         <meta name="viewport" content="width=device-width">
     </head>
     

@@ -188,7 +188,7 @@ foreach($extra_args as $word => $entry) {
 if(count(array_filter($extra_args)) == 0) {
     # create a timestamp-based seed if nothing was entered
     $now = DateTime::createFromFormat('U.u', microtime(true));
-    $final_seed = $now->format("mDyHisu")." "; # it needs the space at the end or else it won't work
+    $final_seed = $now->format("mdyHisvu").time()." "; # it needs the space at the end or else it won't work
 } else {
     foreach($extra_args as $word) {
         $final_seed = $final_seed.$word." ";

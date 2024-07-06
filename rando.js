@@ -16,6 +16,7 @@ window.onload = function(){
         document.getElementById("oopsResult").innerHTML = result.stagename;
         document.getElementById("oopsOriginal").innerHTML = result.first_stage + " (" + result.first_context + ") and "
         + result.second_stage + " (" + result.second_context + ")";
+        document.getElementById("oopsSeed").innerHTML = "Seed: " + result.seed;
     });
 
     document.getElementById("api").onclick = function() {
@@ -32,10 +33,13 @@ window.onload = function(){
 
     document.getElementById("oopsResult").onclick = function() { // clicking original names toggles
         var originalNames = document.getElementById("oopsOriginal");
+        var oopsSeed = document.getElementById("oopsSeed");
         if (originalNames.style.visibility == "hidden") {
             originalNames.style.visibility = "visible";
+            oopsSeed.style.visibility = "visible";
         } else {
             originalNames.style.visibility = "hidden";
+            oopsSeed.style.visibility = "hidden";
         }
     }
 
@@ -60,11 +64,19 @@ function handleForm(event) {
         document.getElementById("oopsResult").innerHTML = result.stagename;
         document.getElementById("oopsOriginal").innerHTML = result.first_stage + " (" + result.first_context + ") and "
         + result.second_stage + " (" + result.second_context + ")";
+        let seed_str = "";
+        let flag_og = result.flags.toString();
+        for(let flag of flag_og.split(',')) {
+            seed_str = seed_str + flag + " ";
+        }
+        document.getElementById("oopsSeed").innerHTML = "Seed: " + seed_str + result.seed;
         
         // hide original names if they're currently visible
         var originalNames = document.getElementById("oopsOriginal");
+        var oopsSeed = document.getElementById("oopsSeed");
         if (originalNames.style.visibility == "visible") {
             originalNames.style.visibility = "hidden";
+            oopsSeed.style.visibility = "hidden";
         }
     })
 }

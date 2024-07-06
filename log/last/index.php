@@ -2,12 +2,12 @@
 <html>
 <head>
         <title>Last Rolls | Poopster</title>
-        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="../../style.css">
         <meta name="viewport" content="width=device-width">
     </head>
     <body>
         <div class="footer">
-            <a href="..">Back</a> | <a href=".">Back to Log</a>
+            <a href="../..">Back</a> | <a href="../../log">Back to Log</a>
             <br>
         </div>
         <div class="savedBlock">

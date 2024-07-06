@@ -1,3 +1,25 @@
+-- 7/5/24 | v5.0.0 --
+- [Poopster enters Version 5!]
+- [br] Added Super Monkey Ball Banana Rumble stages to the roster.
+    - Note that a couple of stages are excluded, but most are there. This will not be updated when the promised patch with an altered stage name is released.
+- The [-world] command can now return EX worlds
+- Revamped the logging system - it now uses an SQLite backend
+    - Calling '-saved' with a number (i.e. '-saved 1') will return the stage with that corresponding ID.
+    - Attempting to save a stage that is already in the log will display the saved entry's ID number.
+    - All previous entries have been updated with proper flags and ported to the new database.
+- Random rolls are now seeded with a timestamp.
+    - The last 100 random rolls are now saved to a file that is accessible from the log page
+- '-old' command, which would call the v3 randomizer, renamed to '-old:v3'.
+- '-old' is now an alias of the new '-old:v4' command, which calls the randomizer as it was prior to this update.
+- Shiny rolls (two of the same stage from the same game) are now indicated with a ⭐ symbol.
+- Poopster can now be accessed from https://poopster.anvilsp.com
+
+- Changed [dx] 'Stag/ger' to 'Stagg/er' - this may affect a few seeds.
+- Fixed [smb3d] stage 'Bigfoot' being split as 'BigFoot'
+- A number of changes that weren't noted in v4:
+    - Fixed many capitalization and spelling errors
+    - Added '-soup' flag. Soupster.
+
 --- 9/3/23 | v4.0.1 ---
 - Addressed an oversight where running the -old flag along with only new v4 game flags would return a blank, which would break Nightbot; a simple error is now printed
 - The -old flag is now preserved in the log when a stage using said flag is saved.
