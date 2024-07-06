@@ -38,6 +38,20 @@ body {
     min-height: 12em;
 }
 
+.savedBlock {
+    margin: auto;
+    text-align: center;
+    border-radius: 0.5em;
+    max-width: 50em;
+    background-color: #353535;
+    padding: 2em 1em 2em 1em;
+    color: #fff;
+}
+
+.savedBlock h2 {
+    margin: 0.25em;
+}
+
 .footer {
     padding: 0.5em;
 }

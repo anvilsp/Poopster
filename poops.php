@@ -285,7 +285,7 @@ if(!$enable_logonly) # do default roll
     $final_stage = generate_stage();
 else { # roll from the logged stages
     try {
-        $db = new SQLite3('poopster.sqlite', SQLITE3_OPEN_READONLY);
+        $db = new SQLite3('log/poopster.sqlite', SQLITE3_OPEN_READONLY);
         if(count($extra_args) > 0 and is_numeric($extra_args[1])) {
             # search by id if the input is something like "-saved 1"
             $random_query = $db->query("SELECT * FROM saved WHERE id = ". $extra_args[1] ." LIMIT 1");
@@ -454,7 +454,7 @@ function generate_world() { # for if the 'world' flag is used, generate a stage 
 function log_stage(Stage $stage) {
     try {
         # create the database if it doesn't already exist
-        $db = new SQLite3('poopster.sqlite', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
+        $db = new SQLite3('log/poopster.sqlite', SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
         $db->enableExceptions(true);
         $db->query('CREATE TABLE IF NOT EXISTS "saved" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
