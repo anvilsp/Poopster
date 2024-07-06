@@ -2,3 +2,10 @@
 /new
 *.key
 *.pub
+poops_temp.php
+log/poopster.sqlite
+log/new_log.txt
+log/log.txt
+log/lastfile.txt
+log/fixlog2.php
+log/fixlog.php
