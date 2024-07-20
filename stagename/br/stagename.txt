@@ -20,7 +20,7 @@ Riding_The_Waves
 Grandfather_Clock
 Switch_And_Go
 Spider_Web
-Conveyer_Avenue
+Conveyor_Avenue
 Wavy_Path
 Switch_And_Jump
 Wormhole_Branches
